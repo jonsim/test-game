@@ -1,0 +1,36 @@
+﻿Build started 12/07/2012 02:34:35.
+     1>Project "D:\Users\Jon\Documents\programming\ogre\test-game\project_file\test-game\test-game.vcxproj" on node 2 (rebuild target(s)).
+     1>_PrepareForClean:
+         Deleting file "Debug\test-game.lastbuildstate".
+       InitializeBuildStatus:
+         Touching "Debug\test-game.unsuccessfulbuild".
+       ClCompile:
+         C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\CL.exe /c /I"D:\OgreSDK\OgreSDK_vc10_v1-7-3\include" /I"D:\OgreSDK\OgreSDK_vc10_v1-7-3\include\OIS" /I"D:\OgreSDK\OgreSDK_vc10_v1-7-3\include\OGRE" /I"D:\OgreSDK\OgreSDK_vc10_v1-7-3\Samples\Common\include" /I"D:\OgreSDK\OgreSDK_vc10_v1-7-3\boost_1_44" /ZI /nologo /W3 /WX- /Od /Oy- /D WIN32 /D _DEBUG /D _WINDOWS /D _MBCS /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Yc"StdAfx.h" /Fp"Debug\test-game.pch" /Fo"Debug\\" /Fd"Debug\vc100.pdb" /Gd /TP /FIstdafx.h /analyze- /errorReport:prompt ..\..\stdafx.cpp
+         stdafx.cpp
+         C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\CL.exe /c /I"D:\OgreSDK\OgreSDK_vc10_v1-7-3\include" /I"D:\OgreSDK\OgreSDK_vc10_v1-7-3\include\OIS" /I"D:\OgreSDK\OgreSDK_vc10_v1-7-3\include\OGRE" /I"D:\OgreSDK\OgreSDK_vc10_v1-7-3\Samples\Common\include" /I"D:\OgreSDK\OgreSDK_vc10_v1-7-3\boost_1_44" /ZI /nologo /W3 /WX- /Od /Oy- /D WIN32 /D _DEBUG /D _WINDOWS /D _MBCS /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Yu"StdAfx.h" /Fp"Debug\test-game.pch" /Fo"Debug\\" /Fd"Debug\vc100.pdb" /Gd /TP /FIstdafx.h /analyze- /errorReport:prompt ..\..\BaseApplication.cpp ..\..\TutorialApplication.cpp
+         TutorialApplication.cpp
+     1>d:\users\jon\documents\programming\ogre\test-game\tutorialapplication.cpp(112): warning C4305: 'argument' : truncation from 'double' to 'Ogre::Real'
+     1>d:\users\jon\documents\programming\ogre\test-game\tutorialapplication.cpp(123): warning C4305: 'argument' : truncation from 'double' to 'const Ogre::Real'
+     1>d:\users\jon\documents\programming\ogre\test-game\tutorialapplication.cpp(123): warning C4305: 'argument' : truncation from 'double' to 'const Ogre::Real'
+     1>d:\users\jon\documents\programming\ogre\test-game\tutorialapplication.cpp(130): warning C4305: 'argument' : truncation from 'double' to 'float'
+     1>d:\users\jon\documents\programming\ogre\test-game\tutorialapplication.cpp(130): warning C4305: 'argument' : truncation from 'double' to 'float'
+     1>d:\users\jon\documents\programming\ogre\test-game\tutorialapplication.cpp(130): warning C4305: 'argument' : truncation from 'double' to 'float'
+     1>d:\users\jon\documents\programming\ogre\test-game\tutorialapplication.cpp(132): warning C4305: 'argument' : truncation from 'double' to 'float'
+     1>d:\users\jon\documents\programming\ogre\test-game\tutorialapplication.cpp(132): warning C4305: 'argument' : truncation from 'double' to 'float'
+     1>d:\users\jon\documents\programming\ogre\test-game\tutorialapplication.cpp(132): warning C4305: 'argument' : truncation from 'double' to 'float'
+         BaseApplication.cpp
+         Generating Code...
+       ManifestResourceCompile:
+         C:\Program Files (x86)\Microsoft SDKs\Windows\v7.0A\bin\rc.exe /nologo /fo"Debug\test-game.exe.embed.manifest.res" Debug\test-game_manifest.rc 
+       Link:
+         C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"D:\Users\Jon\Documents\programming\ogre\test-game\project_file\Debug\test-game.exe" /INCREMENTAL /NOLOGO /LIBPATH:"D:\OgreSDK\OgreSDK_vc10_v1-7-3\lib\Debug" /LIBPATH:"D:\OgreSDK\OgreSDK_vc10_v1-7-3\boost_1_44\lib" OgreTerrain_d.lib OgreMain_d.lib OIS_d.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /ManifestFile:"Debug\test-game.exe.intermediate.manifest" /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /DEBUG /PDB:"D:\Users\Jon\Documents\programming\ogre\test-game\project_file\Debug\test-game.pdb" /SUBSYSTEM:WINDOWS /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"D:\Users\Jon\Documents\programming\ogre\test-game\project_file\Debug\test-game.lib" /MACHINE:X86 "Debug\test-game.exe.embed.manifest.res"
+         Debug\BaseApplication.obj
+         Debug\stdafx.obj
+         Debug\TutorialApplication.obj
+     1>MSVCRTD.lib(crtexew.obj) : error LNK2019: unresolved external symbol _WinMain@16 referenced in function ___tmainCRTStartup
+     1>D:\Users\Jon\Documents\programming\ogre\test-game\project_file\Debug\test-game.exe : fatal error LNK1120: 1 unresolved externals
+     1>Done Building Project "D:\Users\Jon\Documents\programming\ogre\test-game\project_file\test-game\test-game.vcxproj" (rebuild target(s)) -- FAILED.
+
+Build FAILED.
+
+Time Elapsed 00:00:08.11
