@@ -1,21 +1,8 @@
-/*
------------------------------------------------------------------------------
-Filename:    BaseApplication.h
------------------------------------------------------------------------------
+#ifndef BASEAPPLICATION_H
+#define BASEAPPLICATION_H
 
-This source file is part of the
-   ___                 __    __ _ _    _ 
-  /___\__ _ _ __ ___  / / /\ \ (_) | _(_)
- //  // _` | '__/ _ \ \ \/  \/ / | |/ / |
-/ \_// (_| | | |  __/  \  /\  /| |   <| |
-\___/ \__, |_|  \___|   \/  \/ |_|_|\_\_|
-      |___/                              
-      Tutorial Framework
-      http://www.ogre3d.org/tikiwiki/
------------------------------------------------------------------------------
-*/
-#ifndef __BaseApplication_h_
-#define __BaseApplication_h_
+
+//---------- INCLUDES ----------//
 
 #include <OgreCamera.h>
 #include <OgreEntity.h>
@@ -31,8 +18,20 @@ This source file is part of the
 #include <OISKeyboard.h>
 #include <OISMouse.h>
 
+#include <CEGUI.h>
+#include <RendererModules/Ogre/CEGUIOgreRenderer.h>
+
+#include <Terrain/OgreTerrain.h>
+#include <Terrain/OgreTerrainGroup.h>
+
 #include <SdkTrays.h>
 #include <SdkCameraMan.h>
+
+
+
+//---------- DEFINITIONS ----------//
+#define MIN(a, b) (((a) < (b)) ? (a) : (b))
+#define MAX(a, b) (((a) > (b)) ? (a) : (b))
 
 class BaseApplication : public Ogre::FrameListener, public Ogre::WindowEventListener, public OIS::KeyListener, public OIS::MouseListener, OgreBites::SdkTrayListener
 {
@@ -54,6 +53,11 @@ protected:
     virtual void setupResources(void);
     virtual void createResourceListener(void);
     virtual void loadResources(void);
+    virtual void setupGUI (void);
+
+    void setupTargetPath (void);
+    void drawTargetPath (float distance, float height);
+    Ogre::ManualObject* drawLine (Ogre::SceneNode* sn, const Ogre::Vector3& start, const Ogre::Vector3& end, const Ogre::ColourValue& col);
 
     // Ogre::FrameListener
     virtual bool frameRenderingQueued(const Ogre::FrameEvent& evt);
@@ -65,6 +69,8 @@ protected:
     virtual bool mouseMoved( const OIS::MouseEvent &arg );
     virtual bool mousePressed( const OIS::MouseEvent &arg, OIS::MouseButtonID id );
     virtual bool mouseReleased( const OIS::MouseEvent &arg, OIS::MouseButtonID id );
+    // CEGUI
+	CEGUI::MouseButton convertButton(OIS::MouseButtonID buttonID);
 
     // Ogre::WindowEventListener
     //Adjust mouse clipping area
@@ -78,18 +84,31 @@ protected:
     Ogre::RenderWindow* mWindow;
     Ogre::String mResourcesCfg;
     Ogre::String mPluginsCfg;
+    
+    Ogre::BillboardSet* mTargetBillboardSet;
+    Ogre::TerrainGroup* mTerrainGroup;
+    #define ARC_RESOLUTION 100
+    Ogre::SceneNode* mPlayerNode;
+        Ogre::SceneNode* mCameraNode;
+        Ogre::SceneNode* mCharacterNode;
+        Ogre::SceneNode* mPathNode;
+    Ogre::SceneNode* mTargetNode;
+    Ogre::BillboardChain* mPathChain;
 
     // OgreBites
+    CEGUI::OgreRenderer* mGUIRenderer;
+	CEGUI::Window*       mGUIWindow;
     OgreBites::SdkTrayManager* mTrayMgr;
-    OgreBites::SdkCameraMan* mCameraMan;       // basic camera controller
-    OgreBites::ParamsPanel* mDetailsPanel;     // sample details panel
+    OgreBites::ParamsPanel*    mDetailsPanel;  // sample details panel
     bool mCursorWasVisible;                    // was cursor visible before dialog appeared
+    bool mTargetCursorVisible;
+    int  mCursorStartY;
     bool mShutDown;
 
     //OIS Input devices
     OIS::InputManager* mInputManager;
-    OIS::Mouse*    mMouse;
-    OIS::Keyboard* mKeyboard;
+    OIS::Mouse*        mMouse;
+    OIS::Keyboard*     mKeyboard;
 };
 
-#endif // #ifndef __BaseApplication_h_
+#endif // #ifndef BASEAPPLICATION_H
