@@ -92,17 +92,22 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\BaseApplication.cpp" />
+    <ClCompile Include="..\..\GraphicsCore.cpp" />
+    <ClCompile Include="..\..\Input.cpp" />
+    <ClCompile Include="..\..\SceneSetup.cpp" />
     <ClCompile Include="..\..\stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="..\..\TutorialApplication.cpp" />
+    <ClCompile Include="..\..\World.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\BaseApplication.h" />
+    <ClInclude Include="..\..\GraphicsCore.h" />
+    <ClInclude Include="..\..\Input.h" />
+    <ClInclude Include="..\..\SceneSetup.h" />
+    <ClInclude Include="..\..\SharedIncludes.h" />
     <ClInclude Include="..\..\stdafx.h" />
-    <ClInclude Include="..\..\TutorialApplication.h" />
+    <ClInclude Include="..\..\World.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
