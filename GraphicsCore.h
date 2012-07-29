@@ -6,6 +6,7 @@
 
 #include "SceneSetup.h"
 #include "Input.h"
+#include "Player.h"
 #include "World.h"
 
 
@@ -13,17 +14,15 @@
 
 class GraphicsCore : public SceneSetup, public Ogre::FrameListener, public Ogre::WindowEventListener, OgreBites::SdkTrayListener
 {
-private:
-    float mPlayerHeight;
-
-
 public:
     GraphicsCore (void);
     virtual ~GraphicsCore (void);
 
     virtual void go(void);
-    void showAimReticule (OIS::MouseState ms);
-    void hideAimReticule (void);
+
+    // Input
+    Input* mUserInput;
+    Ogre::Camera* mCamera;
 
 
 protected:
@@ -40,8 +39,6 @@ protected:
 
 
     // stuff
-    void setupTargetPath (void);
-    void drawTargetPath (float height);
     Ogre::ManualObject* drawLine (Ogre::SceneNode* sn, const Ogre::Vector3& start, const Ogre::Vector3& end, const Ogre::ColourValue& col);
 
 
@@ -61,22 +58,12 @@ protected:
 
 
     // jazz
-
     Ogre::Root *mRoot;
-    Ogre::Camera* mCamera;
     Ogre::SceneManager* mSceneMgr;
     Ogre::RenderWindow* mWindow;
     Ogre::String mResourcesCfg;
     Ogre::String mPluginsCfg;
     
-    Ogre::BillboardSet* mTargetBillboardSet;
-    #define ARC_RESOLUTION 100
-    Ogre::SceneNode* mPlayerNode;
-        Ogre::SceneNode* mCameraNode;
-        Ogre::SceneNode* mCharacterNode;
-        Ogre::SceneNode* mPathNode;
-    Ogre::SceneNode* mTargetNode;
-    Ogre::BillboardChain* mPathChain;
 
     // OgreBites
     CEGUI::OgreRenderer* mGUIRenderer;
@@ -84,15 +71,8 @@ protected:
     OgreBites::SdkTrayManager* mTrayMgr;
     OgreBites::ParamsPanel*    mDetailsPanel;  // sample details panel
     bool mCursorWasVisible;                    // was cursor visible before dialog appeared
-    float mPlayerAimHeight;
     int  mCursorStartY;
     bool mShutDown;
-
-    // Input
-    Input* mUserInput;
-
-    // World
-    World* mWorld;
 };
 
 #endif // #ifndef GRAPHICSCORE_H

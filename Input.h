@@ -17,13 +17,10 @@
 
 
 //---------- DEFINITIONS ----------//
-// Externals
-class GraphicsCore;
-
 class Input : public OIS::KeyListener, public OIS::MouseListener
 {
 public:
-    Input (OIS::ParamList paramList, GraphicsCore* gc);
+    Input (OIS::ParamList paramList);
     virtual ~Input (void);
     void capture (void);
 
@@ -46,10 +43,6 @@ protected:
     
     // CEGUI
 	CEGUI::MouseButton convertButton (OIS::MouseButtonID buttonID);
-
-
-private:
-    GraphicsCore* mGraphicsCore;
 };
 
 #endif // #ifndef INPUT_H

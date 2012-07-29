@@ -92,6 +92,8 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\Camera.cpp" />
+    <ClCompile Include="..\..\Core.cpp" />
     <ClCompile Include="..\..\GraphicsCore.cpp" />
     <ClCompile Include="..\..\Input.cpp" />
     <ClCompile Include="..\..\Player.cpp" />
@@ -103,6 +105,8 @@
     <ClCompile Include="..\..\World.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\Camera.h" />
+    <ClInclude Include="..\..\Core.h" />
     <ClInclude Include="..\..\GraphicsCore.h" />
     <ClInclude Include="..\..\Input.h" />
     <ClInclude Include="..\..\Player.h" />

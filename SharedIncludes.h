@@ -3,6 +3,7 @@
 
 
 //---------- INCLUDES ----------//
+#include "Core.h"
 #include "GraphicsCore.h"
 #include "Input.h"
 

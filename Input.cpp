@@ -7,7 +7,7 @@
 //---------- FUNCTIONS ----------//
 
 /// @brief  Constructor
-Input::Input (OIS::ParamList paramList, GraphicsCore* gc) : mGraphicsCore(gc)
+Input::Input (OIS::ParamList paramList)
 {
     // Create input system.
     mInputManager = OIS::InputManager::createInputSystem(paramList);
@@ -100,7 +100,7 @@ bool Input::mousePressed (const OIS::MouseEvent &arg, OIS::MouseButtonID id)
     if (id == OIS::MB_Left)
     {
         OIS::MouseState ms = mMouse->getMouseState();
-        mGraphicsCore->showAimReticule(ms);
+        Core::mPlayer->showTargettingSystem(ms);
     }
 
     return true;
@@ -117,7 +117,7 @@ bool Input::mouseReleased (const OIS::MouseEvent &arg, OIS::MouseButtonID id)
     if (id == OIS::MB_Left)
     {
         // Hide the pathing nodule.
-        mGraphicsCore->hideAimReticule();
+        Core::mPlayer->hideTargettingSystem();
 
         // Show the normal cursor again.
         CEGUI::MouseCursor::getSingleton().show();

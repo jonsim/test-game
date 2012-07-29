@@ -16,7 +16,6 @@ GraphicsCore::GraphicsCore (void) : mRoot(0),
                                 mPluginsCfg(Ogre::StringUtil::BLANK),
                                 mTrayMgr(0),
                                 mDetailsPanel(0),
-                                mPlayerAimHeight(100),
                                 mCursorWasVisible(false),
                                 mShutDown(false)
 {
@@ -152,7 +151,7 @@ void GraphicsCore::createFrameListener (void)
     windowHndStr << windowHnd;
     pl.insert(std::make_pair(std::string("WINDOW"), windowHndStr.str()));
 
-    mUserInput = new Input(pl, this);
+    mUserInput = new Input(pl);
 
 
 
@@ -263,16 +262,6 @@ void GraphicsCore::createCamera (void)
         mCamera->setFarClipDistance(0);
     else
         mCamera->setFarClipDistance(50000);
-
-    // Setup the nodes, this isn't really the right place to setup the player node but it will do for now.
-    mPlayerNode = mSceneMgr->getRootSceneNode()->createChildSceneNode("PlayerNode");
-    mCameraNode    = mPlayerNode->createChildSceneNode("CameraNode");
-    mCharacterNode = mPlayerNode->createChildSceneNode("CharacterNode");
-    mPathNode      = mPlayerNode->createChildSceneNode("PathNode");
-    mCameraNode->attachObject(mCamera);
-    mCameraNode->setPosition(0, 100, 200);
-    mPathNode->setVisible(false);
-    setupTargetPath();
 }
 
 
@@ -325,46 +314,19 @@ void GraphicsCore::createScene (void)
     
     mSceneMgr->setAmbientLight(Ogre::ColourValue(0.2f, 0.2f, 0.2f));
     
-
     // Setup terrain
-    mWorld = new World(mSceneMgr, light);
+    Core::mWorld = new World(mSceneMgr, light);
 
-
-    // Add entities
-    // Add player
-    Ogre::Entity* playerEntity = mSceneMgr->createEntity("PlayerCharacter", "potato.mesh");
-    Ogre::AxisAlignedBox bb = playerEntity->getBoundingBox();
-    mPlayerHeight = (bb.getMaximum().y - bb.getMinimum().y) * 0.1f * 0.5f;
-    mCharacterNode->attachObject(playerEntity);
-    mCharacterNode->setScale(0.1f, 0.1f, 0.1f);
-    mCharacterNode->setPosition(0, 0, 0);
-
-    // Add target marker
-    mTargetNode = mSceneMgr->getRootSceneNode()->createChildSceneNode("TargetNode");
-    Ogre::Entity* targetEntity = mSceneMgr->createEntity("TargetEntity", "sphere.mesh");
-    mTargetNode->attachObject(targetEntity);
-    targetEntity = mSceneMgr->createEntity("TargetEntity2", "column.mesh");
-    mTargetNode->attachObject(targetEntity);
-    mTargetNode->setScale(0.1f, 0.1f, 0.1f);
-    mTargetNode->setPosition(0, 0, 0);
-
-
-    // Billboard set
-    mTargetBillboardSet = mSceneMgr->createBillboardSet("TargetBillboardSet", 2);
-    mSceneMgr->getRootSceneNode()->attachObject(mTargetBillboardSet);
-    mTargetBillboardSet->setMaterialName("Examples/Flare");
-    mTargetBillboardSet->setVisible(true);
-    mTargetBillboardSet->createBillboard(0, 300, 0, Ogre::ColourValue(0.5f, 0.6f, 1.0f));
-    mTargetBillboardSet->setDefaultDimensions(100, 100);
-    mTargetBillboardSet->setBillboardType(Ogre::BBT_ORIENTED_COMMON);
-    mTargetBillboardSet->setCommonUpVector(Ogre::Vector3(0, 1, 0));
+    // Setup the player yo.
+    Core::mPlayer = new Player(mSceneMgr);
+    Core::mPlayer->attachCamera(mCamera);
 }
 
 
 
 void GraphicsCore::destroyScene (void)
 {
-    delete mWorld;
+    delete Core::mWorld;
 }
 
 
@@ -391,189 +353,6 @@ Ogre::ManualObject* GraphicsCore::drawLine (Ogre::SceneNode* sn, const Ogre::Vec
     sn->createChildSceneNode(nodeName)->attachObject(mo);
 
     return mo;
-}
-
-
-
-void GraphicsCore::setupTargetPath (void)
-{
-    // Add billboard chain
-    mPathChain = mSceneMgr->createBillboardChain("arc");
-    mPathChain->setNumberOfChains(1);
-    mPathChain->setMaxChainElements(ARC_RESOLUTION);
-    mPathChain->setTextureCoordDirection(Ogre::BillboardChain::TCD_V);
-    mPathChain->setMaterialName("Examples/LightRibbonTrail");
-    mPathNode->attachObject(mPathChain);
-    mPathChain->setVisible(true);
-}
-
-
-
-void GraphicsCore::drawTargetPath (float height)
-{
-    char bob[128];
-    sprintf(bob, "height = %.2f\n", height);
-    OutputDebugString(bob);
-
-    // The curve's equation is of the form  y = a - ((x - b) / c)^2  (an upside down parabola).
-    // a gives the curve's maximum height (apex), b gives the curves centre on the x-axis and
-    // c can be shown to be equal to b / sqrt(a). Imposing the arbitrary constraint that
-    // a*b = 500 the curve's area becomes fixed, giving the illusion of different trajectories.
-    float x, y, z;
-    Ogre::Vector3 localPosition, worldPosition;
-    
-    Ogre::Vector3 playerPos = mPlayerNode->getPosition();
-    Ogre::Vector3 targetPos = mTargetNode->getPosition();
-    Ogre::Vector3 targetPos_pc = mPlayerNode->convertWorldToLocalPosition(targetPos);
-    targetPos_pc.y = 0;
-    float distance = targetPos_pc.length();
-
-    // Deriving a curve's parameters requires 3 known points. We only have 2 available (the start and end),
-    // however we also know the maximum height we want the curve to reach. Using this and making some assumptions
-    // about the shape of the curve that we want we can infer a third point, the 'apex' of the curve. This will
-    // not actually be the curve's true apex, but the curve will pass through it and the closeness of the model
-    // used to approximate the third point to the true curve will affect how close this apex is.
-    //
-    // Start with three points, p1=(x1, y1), p2=(x2, y2) p3=(x3, y3). p1 and p3 are the start and end co-ordinates
-    // in 2D co-ordinates relative to the player node (so p1 is always (0, 0))(they could be in world co-ordinates
-    // but it adds unnecessary complexity to the calculations later).
-    // The naive approach to getting a third point would be to assume that the apex of the curve would be central
-    // along the x-axis (i.e. distance / 2), true when there is no difference in height between the player and the
-    // target, however when a significant drop in height occurs between the two it means that the curve will be
-    // significantly too high (as the true apex would fall closer to the player along the curve, but the curve 
-    // must still pass through the calculated apex midway along the curve, causing the true apex to be much 
-    // higher). The solution is to model the curve (with no knowledge of it) and guess where the true apex will
-    // occur, thus minimising the difference between calculated and true apex and the over/under shooting that 
-    // occurs.
-    // To do this we use the simple, arbitrarily selected curve y = -0.2 x^2, where x = -sqrt( abs(5y) ). Using
-    // this we can calculate where the apex of the curve falls on the x-axis in relation to the starting height
-    // of the curve. Selecting three points from this curve (in this case (0, 0.5), (0.5, 0.415), (0.875, 0.261)
-    // using the x-axis to represent the height the player node starts at relative to the TOTAL vertical distance
-    // (i.e. not in player co-ordinates) and the y-axis to represent the horizontal position of the apex relative
-    // to the total horizontal distance travelled) allow us to build a further curve showing the rate of change
-    // of the apex position against the changing starting height. This curve has the parameters (a=-0.275,
-    // b=-0.032, c=0.5) and, given x = (drop distance) / (drop distance + apex height to player) produces the
-    // horizontal position of the apex along the curve (between 0 and 1). This apex is for the previously noted
-    // curve y = -0.2 x^2, however since our desired curve is of polynomial order and the sam rough shape, it is
-    // not a wild assumption that the apex of OUR curve will be in a similar location.
-    // The output we just generated can be multiplied by the total distance travelled by our curve to give an
-    // approximation of the x co-ordinate of the apex. This completes the third point to derive our curves
-    // parameters, allowing it to be evaluated and plotted.
-    // If greater accuracy is required, the curve generated at this point can be fed back into the algorithm in
-    // an iterative manner in place of the function y=-0.2x^2 as a much more accurate method of approximating the
-    // apex's location. This would be relatively straight forward though computationally expensive as this 
-    // calculation would have to be done online and, since the curve would be more complicated, differentiation
-    // would have to be used to calculate the apex rather than inverting the function. The advantage of this is
-    // that the output would be far more accurate and would converge rapidly - I would estimate that no more than
-    // one such iteration would be required.
-
-    float x1 = 0;                   float y1 = 0;
-    float x3 = distance;            float y3 = targetPos.y - playerPos.y;
-    float x2 = distance * 0.5f;     float y2 = (height + MAX(y1, y3));
-
-    float heightDropRatio, apexDistanceRatio;
-    if (y3 > 0)
-        heightDropRatio   = ( y3) / ( y3 + height);
-    else
-        heightDropRatio   = (-y3) / (-y3 + height);
-    apexDistanceRatio = (-0.275 * heightDropRatio * heightDropRatio) + (-0.032 * heightDropRatio) + 0.5;
-    if (y3 > 0)
-        apexDistanceRatio = 1 - apexDistanceRatio;
-    x2 = apexDistanceRatio * distance;
-
-    //char bob[128];
-    sprintf(bob, "heightDropRatio=%.2f, apexDistanceRatio=%.2f\n", heightDropRatio, apexDistanceRatio);
-    OutputDebugString(bob);
-
-                                    //float y2 = height - (y3 / 2.0f);
-    /*Ogre::Matrix3 xMat( x1*x1, x1, 1,
-                        x2*x2, x2, 1,
-                        x3*x3, x3, 1  );
-    Ogre::Vector3 yMat( y1,
-                        y2,
-                        y3  );
-    Ogre::Matrix3 xMatI = xMat.Inverse();
-    Ogre::Vector3 rMat = xMatI * yMat;*/
-    float denom = (x1 - x2) * (x1 - x3) * (x2 - x3);
-    float A     = (x3 * (y2 - y1) + x2 * (y1 - y3) + x1 * (y3 - y2)) / denom;
-    float B     = (x3*x3 * (y1 - y2) + x2*x2 * (y3 - y1) + x1*x1 * (y2 - y3)) / denom;
-    float C     = (x2 * x3 * (x2 - x3) * y1 + x3 * x1 * (x3 - x1) * y2 + x1 * x2 * (x1 - x2) * y3) / denom;
-    
-    // Clear the chains in preparation to redraw.
-    mPathChain->clearAllChains();
-    mPathChain->addChainElement(0, Ogre::BillboardChain::Element(Ogre::Vector3::ZERO, 1, 0, Ogre::ColourValue(1.0f, 1.0f, 1.0f)));
-    float eval_step = distance / ((float) ARC_RESOLUTION);
-    for (float i = eval_step; i < distance; i += eval_step)
-    {
-        // Evaluate the curve at the current point.
-        x = 0;
-        y = A * i * i + B * i + C;
-        z = -i;
-
-        // Check the curve to see if it has clipped through the terrain
-        localPosition = Ogre::Vector3(x, y, z);
-
-        // Redraw the curve with the new values.
-        mPathChain->addChainElement(0, Ogre::BillboardChain::Element(localPosition, 1, 0, Ogre::ColourValue(1.0f, 1.0f, 1.0f)));
-    }
-}
-
-
-
-void GraphicsCore::showAimReticule (OIS::MouseState ms)
-{
-    Ogre::Vector3 terrainHitPosition;
-
-    // Place the target node ting
-    // Ray cast from the current mouse point through the camera
-    Ogre::Ray mouseRay = mCamera->getCameraToViewportRay(ms.X.abs / ((float) ms.width), ms.Y.abs / ((float) ms.height));
-    bool terrainHit = mWorld->terrainRaycast(mouseRay, &terrainHitPosition);
-
-    // Check if the user clicked on terrain
-    if (terrainHit)
-    {
-        // Get the terrain normal
-        Ogre::Vector3 n = mWorld->getTerrainNormal(terrainHitPosition);
-
-        // Place and angle the aim nodule
-        mTargetNode->setPosition(terrainHitPosition);
-        mTargetNode->setDirection(n, Ogre::Node::TS_WORLD, Ogre::Vector3::UNIT_Y);
-        //mTargetBillboardSet->setCommonUpVector(Ogre::Vector3(0, 1, 0));
-        //mTargetBillboardSet->setCommonUpVector(n);
-        //mTargetBillboardSet->getBillboard(0)->setPosition(terrainHit.position + Ogre::Vector3(0, 5, 0));
-        mTargetNode->setVisible(true);
-
-        // Get the direction of the target relative to the player, projecting it down into 2D to get the planar
-        // distance (XZ plane) of the target (elevation is accounted for when solving the equations to produce 
-        // the curve by further projection to the XY plane and subsequent rotation). Failing to project to XZ
-        // here will cause erroneous distances to be calculated later on.
-        Ogre::Vector3 targetVector_pc = mPlayerNode->convertWorldToLocalPosition(mTargetNode->getPosition());
-        targetVector_pc.y = 0;
-        //float        targetDistance = targetVector_pc.length();
-        Ogre::Radian targetAngle    = targetVector_pc.angleBetween(Ogre::Vector3::NEGATIVE_UNIT_Z);
-        if (targetVector_pc.x > 0)
-            targetAngle *= -1;
-
-        // Angle the path node appropriately.
-        mPathNode->setOrientation(Ogre::Quaternion(targetAngle, Ogre::Vector3::UNIT_Y));
-
-        // Draw the path.
-        drawTargetPath(mPlayerAimHeight);
-
-        // Hide the normal cursor.
-        CEGUI::MouseCursor::getSingleton().hide();
-        
-        // Display the aiming cursor.
-        mPathNode->setVisible(true);
-        mTargetNode->setVisible(true);
-    }
-}
-
-
-void GraphicsCore::hideAimReticule (void)
-{
-        mPathNode->setVisible(false);
-        mTargetNode->setVisible(false);
 }
 
 
@@ -612,72 +391,25 @@ void GraphicsCore::windowClosed (Ogre::RenderWindow* rw)
 
 bool GraphicsCore::frameRenderingQueued (const Ogre::FrameEvent& evt)
 {
+    // Capture input.
+    mUserInput->capture();
+    
+    // Check for exit conditions.
     if (mWindow->isClosed())
         return false;
-
     if (mShutDown)
         return false;
+    if (mUserInput->mKeyboard->isKeyDown(OIS::KC_ESCAPE) == true)
+        mShutDown = true;
     
-    //Need to inject timestamps to CEGUI System.
+    // Inject CEGUI timestamps.
     CEGUI::System::getSingleton().injectTimePulse(evt.timeSinceLastFrame);
 
-    //Need to capture/update each device
-    mUserInput->capture();
-    if (mUserInput->mKeyboard->isKeyDown(OIS::KC_ESCAPE) == true)
-    {
-        mShutDown = true;
-    }
+    // Update various parts of the graphics.
+    Core::mPlayer->frameUpdate(evt.timeSinceLastFrame);
 
-    //mTrayMgr->frameRenderingQueued(evt);
-
-    /*if (!mTrayMgr->isDialogVisible())
-    {
-        if (mDetailsPanel->isVisible())   // if details panel is visible, then update its contents
-        {
-            mDetailsPanel->setParamValue(0, Ogre::StringConverter::toString(mCamera->getDerivedPosition().x));
-            mDetailsPanel->setParamValue(1, Ogre::StringConverter::toString(mCamera->getDerivedPosition().y));
-            mDetailsPanel->setParamValue(2, Ogre::StringConverter::toString(mCamera->getDerivedPosition().z));
-            mDetailsPanel->setParamValue(4, Ogre::StringConverter::toString(mCamera->getDerivedOrientation().w));
-            mDetailsPanel->setParamValue(5, Ogre::StringConverter::toString(mCamera->getDerivedOrientation().x));
-            mDetailsPanel->setParamValue(6, Ogre::StringConverter::toString(mCamera->getDerivedOrientation().y));
-            mDetailsPanel->setParamValue(7, Ogre::StringConverter::toString(mCamera->getDerivedOrientation().z));
-        }
-    }*/
-
-
-
-    Ogre::Vector3 pp = mPlayerNode->getPosition();
-    pp.y = mWorld->getTerrainHeight(pp) + mPlayerHeight;
-    
-    float forward = 0;
-    if (mUserInput->mKeyboard->isKeyDown(OIS::KC_W))
-        forward -= 200 * evt.timeSinceLastFrame;
-    if (mUserInput->mKeyboard->isKeyDown(OIS::KC_S))
-        forward += 200 * evt.timeSinceLastFrame;
-
-    float right = 0;
-    if (mUserInput->mKeyboard->isKeyDown(OIS::KC_Q))
-        right += 200 * evt.timeSinceLastFrame;
-    if (mUserInput->mKeyboard->isKeyDown(OIS::KC_E))
-        right -= 200 * evt.timeSinceLastFrame;
-
-    float clockwise = 0;
-    if (mUserInput->mKeyboard->isKeyDown(OIS::KC_A))
-        clockwise += 100 * evt.timeSinceLastFrame;
-    if (mUserInput->mKeyboard->isKeyDown(OIS::KC_D))
-        clockwise -= 100 * evt.timeSinceLastFrame;
-
-    mPlayerNode->rotate(Ogre::Vector3::UNIT_Y, Ogre::Radian(Ogre::Degree(clockwise)));
-
-    Ogre::Radian rot = mPlayerNode->getOrientation().getYaw(true);
-    float zComponent = Ogre::Math::Cos(rot);
-    float xComponent = Ogre::Math::Sin(rot);
-    
-    mPlayerNode->setPosition(pp.x + (xComponent * forward) + (xComponent * right), pp.y, pp.z + (zComponent * forward) + (zComponent * right));
-
-    
     // Update the terrain, saving it if it has been updated and not already been.
-    mWorld->saveTerrainState();
+    Core::mWorld->saveTerrainState();
 
     return true;
 }
@@ -699,9 +431,10 @@ extern "C" {
     int main (int argc, char *argv[])
 #endif
     {
-        // Create application object
+        // Create application object, and save a reference to it.
         GraphicsCore app;
- 
+        Core::setup(&app);
+        
         try
         {
             app.go();
