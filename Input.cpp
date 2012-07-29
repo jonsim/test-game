@@ -9,8 +9,10 @@
 /// @brief  Constructor
 Input::Input (OIS::ParamList paramList, GraphicsCore* gc) : mGraphicsCore(gc)
 {
+    // Create input system.
     mInputManager = OIS::InputManager::createInputSystem(paramList);
 
+    // Create keyboard and mouse inputs.
     mKeyboard = static_cast<OIS::Keyboard*>(mInputManager->createInputObject(OIS::OISKeyboard, true));
     mMouse    = static_cast<OIS::Mouse*>(   mInputManager->createInputObject(OIS::OISMouse,    true));
     
@@ -23,6 +25,7 @@ Input::Input (OIS::ParamList paramList, GraphicsCore* gc) : mGraphicsCore(gc)
 /// @brief  Deconstructor
 Input::~Input (void)
 {
+    // Destroy input system.
     mInputManager->destroyInputObject(mMouse);
     mInputManager->destroyInputObject(mKeyboard);
 
@@ -42,95 +45,10 @@ void Input::capture (void)
 
 bool Input::keyPressed (const OIS::KeyEvent &arg)
 {
+    // Inject keypress into CEGUI.
     CEGUI::System &sys = CEGUI::System::getSingleton();
     sys.injectKeyDown(arg.key);
     sys.injectChar(arg.text);
-
-    /*if (mTrayMgr->isDialogVisible())
-        return true;   // don't process any more keys if dialog is up
-
-    if (arg.key == OIS::KC_F)   // toggle visibility of advanced frame stats
-    {
-        mTrayMgr->toggleAdvancedFrameStats();
-    }
-    else if (arg.key == OIS::KC_G)   // toggle visibility of even rarer debugging details
-    {
-        if (mDetailsPanel->getTrayLocation() == OgreBites::TL_NONE)
-        {
-            mTrayMgr->moveWidgetToTray(mDetailsPanel, OgreBites::TL_TOPRIGHT, 0);
-            mDetailsPanel->show();
-        }
-        else
-        {
-            mTrayMgr->removeWidgetFromTray(mDetailsPanel);
-            mDetailsPanel->hide();
-        }
-    }
-    else if (arg.key == OIS::KC_T)   // cycle polygon rendering mode
-    {
-        Ogre::String newVal;
-        Ogre::TextureFilterOptions tfo;
-        unsigned int aniso;
-
-        switch (mDetailsPanel->getParamValue(9).asUTF8()[0])
-        {
-        case 'B':
-            newVal = "Trilinear";
-            tfo = Ogre::TFO_TRILINEAR;
-            aniso = 1;
-            break;
-        case 'T':
-            newVal = "Anisotropic";
-            tfo = Ogre::TFO_ANISOTROPIC;
-            aniso = 8;
-            break;
-        case 'A':
-            newVal = "None";
-            tfo = Ogre::TFO_NONE;
-            aniso = 1;
-            break;
-        default:
-            newVal = "Bilinear";
-            tfo = Ogre::TFO_BILINEAR;
-            aniso = 1;
-        }
-
-        Ogre::MaterialManager::getSingleton().setDefaultTextureFiltering(tfo);
-        Ogre::MaterialManager::getSingleton().setDefaultAnisotropy(aniso);
-        mDetailsPanel->setParamValue(9, newVal);
-    }
-    else if (arg.key == OIS::KC_R)   // cycle polygon rendering mode
-    {
-        Ogre::String newVal;
-        Ogre::PolygonMode pm;
-
-        switch (mCamera->getPolygonMode())
-        {
-        case Ogre::PM_SOLID:
-            newVal = "Wireframe";
-            pm = Ogre::PM_WIREFRAME;
-            break;
-        case Ogre::PM_WIREFRAME:
-            newVal = "Points";
-            pm = Ogre::PM_POINTS;
-            break;
-        default:
-            newVal = "Solid";
-            pm = Ogre::PM_SOLID;
-        }
-
-        mCamera->setPolygonMode(pm);
-        mDetailsPanel->setParamValue(10, newVal);
-    }
-    else if(arg.key == OIS::KC_F5)   // refresh all textures
-    {
-        Ogre::TextureManager::getSingleton().reloadAll();
-    }
-    else if (arg.key == OIS::KC_SYSRQ)   // take a screenshot
-    {
-        mWindow->writeContentsToTimestampedFile("screenshot", ".jpg");
-    }
-    else*/ 
 
     return true;
 }
@@ -139,6 +57,7 @@ bool Input::keyPressed (const OIS::KeyEvent &arg)
 
 bool Input::keyReleased (const OIS::KeyEvent &arg)
 {
+    // Inject keyrelease into CEGUI.
     CEGUI::System::getSingleton().injectKeyUp(arg.key);
 
     return true;
@@ -148,25 +67,22 @@ bool Input::keyReleased (const OIS::KeyEvent &arg)
 
 bool Input::mouseMoved (const OIS::MouseEvent &arg)
 {
-//    if (mTrayMgr->injectMouseMove(arg))
-//        return true;
-
-    // Inject CEGUI
+    // Inject mouse into CEGUI.
     CEGUI::System &sys = CEGUI::System::getSingleton();
     sys.injectMouseMove(arg.state.X.rel, arg.state.Y.rel);
-    // Scroll wheel.
     if (arg.state.Z.rel)
         sys.injectMouseWheelChange(arg.state.Z.rel / 120.0f);
 
-    
+    // Process mouse movements.
     if (arg.state.buttonDown(OIS::MB_Left))
     {
-
+        // If player is holding down LMB, update aim reticule.
         //mPlayerAimHeight += arg.state.Y.rel;
         //drawTargetPath(mPlayerAimHeight);
     }
     else if (arg.state.buttonDown(OIS::MB_Right))
     {
+        // If player is holding down RMB, update player rotation.
         //mPlayerNode->rotate(Ogre::Vector3::UNIT_Y, Ogre::Radian(Ogre::Degree(-0.3 * arg.state.X.rel)));
     }
 
@@ -177,12 +93,10 @@ bool Input::mouseMoved (const OIS::MouseEvent &arg)
 
 bool Input::mousePressed (const OIS::MouseEvent &arg, OIS::MouseButtonID id)
 {
-    // Inject CEGUI
+    // Inject mouse into CEGUI.
     CEGUI::System::getSingleton().injectMouseButtonDown(convertButton(id));
 
-//    if (mTrayMgr->injectMouseDown(arg, id))
-//        return true;
-
+    // Process mouse presses.
     if (id == OIS::MB_Left)
     {
         OIS::MouseState ms = mMouse->getMouseState();
@@ -196,12 +110,10 @@ bool Input::mousePressed (const OIS::MouseEvent &arg, OIS::MouseButtonID id)
 
 bool Input::mouseReleased (const OIS::MouseEvent &arg, OIS::MouseButtonID id)
 {
-    // Inject CEGUI
+    // Inject mouse into CEGUI.
     CEGUI::System::getSingleton().injectMouseButtonUp(convertButton(id));
 
-//    if (mTrayMgr->injectMouseUp(arg, id))
-//        return true;
-    
+    // Process mouse releases.
     if (id == OIS::MB_Left)
     {
         // Hide the pathing nodule.
@@ -216,6 +128,7 @@ bool Input::mouseReleased (const OIS::MouseEvent &arg, OIS::MouseButtonID id)
 
 
 
+/// @brief  Converts OIS buttons to CEGUI types.
 CEGUI::MouseButton Input::convertButton (OIS::MouseButtonID buttonID)
 {
     switch (buttonID)

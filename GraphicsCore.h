@@ -6,6 +6,7 @@
 
 #include "SceneSetup.h"
 #include "Input.h"
+#include "World.h"
 
 
 //---------- DEFINITIONS ----------//
@@ -13,14 +14,7 @@
 class GraphicsCore : public SceneSetup, public Ogre::FrameListener, public Ogre::WindowEventListener, OgreBites::SdkTrayListener
 {
 private:
-    Ogre::TerrainGlobalOptions* mTerrainGlobals;
-    OgreBites::Label* mInfoLabel;
-    bool mTerrainsImported;
     float mPlayerHeight;
- 
-    void defineTerrain (long x, long y);
-    void initBlendMaps (Ogre::Terrain* terrain);
-    void configureTerrainDefaults (Ogre::Light* light);
 
 
 public:
@@ -49,11 +43,8 @@ protected:
     void setupTargetPath (void);
     void drawTargetPath (float height);
     Ogre::ManualObject* drawLine (Ogre::SceneNode* sn, const Ogre::Vector3& start, const Ogre::Vector3& end, const Ogre::ColourValue& col);
-    Ogre::Vector3 getTerrainNormalAtWorldPosition (Ogre::Vector3 pos);
 
 
-
-    
 
     // Ogre::WindowEventListener
     //Adjust mouse clipping area
@@ -79,7 +70,6 @@ protected:
     Ogre::String mPluginsCfg;
     
     Ogre::BillboardSet* mTargetBillboardSet;
-    Ogre::TerrainGroup* mTerrainGroup;
     #define ARC_RESOLUTION 100
     Ogre::SceneNode* mPlayerNode;
         Ogre::SceneNode* mCameraNode;
@@ -100,6 +90,9 @@ protected:
 
     // Input
     Input* mUserInput;
+
+    // World
+    World* mWorld;
 };
 
 #endif // #ifndef GRAPHICSCORE_H
