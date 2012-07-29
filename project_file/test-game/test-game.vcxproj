@@ -94,6 +94,7 @@
   <ItemGroup>
     <ClCompile Include="..\..\GraphicsCore.cpp" />
     <ClCompile Include="..\..\Input.cpp" />
+    <ClCompile Include="..\..\Player.cpp" />
     <ClCompile Include="..\..\SceneSetup.cpp" />
     <ClCompile Include="..\..\stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
@@ -104,6 +105,7 @@
   <ItemGroup>
     <ClInclude Include="..\..\GraphicsCore.h" />
     <ClInclude Include="..\..\Input.h" />
+    <ClInclude Include="..\..\Player.h" />
     <ClInclude Include="..\..\SceneSetup.h" />
     <ClInclude Include="..\..\SharedIncludes.h" />
     <ClInclude Include="..\..\stdafx.h" />

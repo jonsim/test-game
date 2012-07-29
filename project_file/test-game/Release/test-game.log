@@ -1,16 +1,15 @@
-﻿Build started 29/07/2012 02:52:59.
+﻿Build started 29/07/2012 15:21:23.
      1>Project "D:\Users\Jon\Documents\programming\ogre\test-game\project_file\test-game\test-game.vcxproj" on node 2 (build target(s)).
      1>InitializeBuildStatus:
          Creating "Release\test-game.unsuccessfulbuild" because "AlwaysCreate" was specified.
        ClCompile:
          All outputs are up-to-date.
-         C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\CL.exe /c /I"D:\OgreSDK\OgreSDK_vc10_v1-7-3\include" /I"D:\OgreSDK\OgreSDK_vc10_v1-7-3\include\OIS" /I"D:\OgreSDK\OgreSDK_vc10_v1-7-3\include\OGRE" /I"D:\OgreSDK\OgreSDK_vc10_v1-7-3\Samples\Common\include" /I"D:\OgreSDK\OgreSDK_vc10_v1-7-3\boost_1_44" /I..\..\cegui\include /Zi /nologo /W3 /WX- /O2 /Oi /Oy- /GL /D WIN32 /D NDEBUG /D _WINDOWS /D _MBCS /Gm- /EHsc /MD /GS /Gy /fp:precise /Zc:wchar_t /Zc:forScope /Yu"StdAfx.h" /Fp"Release\test-game.pch" /Fo"Release\\" /Fd"Release\vc100.pdb" /Gd /TP /FIstdafx.h /analyze- /errorReport:prompt ..\..\GraphicsCore.cpp ..\..\Input.cpp ..\..\World.cpp
-         GraphicsCore.cpp
-         Input.cpp
-         World.cpp
+         C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\CL.exe /c /I"D:\OgreSDK\OgreSDK_vc10_v1-7-3\include" /I"D:\OgreSDK\OgreSDK_vc10_v1-7-3\include\OIS" /I"D:\OgreSDK\OgreSDK_vc10_v1-7-3\include\OGRE" /I"D:\OgreSDK\OgreSDK_vc10_v1-7-3\Samples\Common\include" /I"D:\OgreSDK\OgreSDK_vc10_v1-7-3\boost_1_44" /I..\..\cegui\include /Zi /nologo /W3 /WX- /O2 /Oi /Oy- /GL /D WIN32 /D NDEBUG /D _WINDOWS /D _MBCS /Gm- /EHsc /MD /GS /Gy /fp:precise /Zc:wchar_t /Zc:forScope /Yu"StdAfx.h" /Fp"Release\test-game.pch" /Fo"Release\\" /Fd"Release\vc100.pdb" /Gd /TP /FIstdafx.h /analyze- /errorReport:prompt ..\..\Player.cpp
+         Player.cpp
        Link:
          C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"D:\Users\Jon\Documents\programming\ogre\test-game\project_file\Release\test-game.exe" /INCREMENTAL:NO /NOLOGO /LIBPATH:"D:\OgreSDK\OgreSDK_vc10_v1-7-3\lib\Release" /LIBPATH:"D:\OgreSDK\OgreSDK_vc10_v1-7-3\boost_1_44\lib" /LIBPATH:..\..\cegui\lib OgreTerrain.lib OgreMain.lib OIS.lib CEGUIOgreRenderer.lib CEGUIBase.lib CEGUIExpatParser.lib CEGUIFalagardWRBase.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /ManifestFile:"Release\test-game.exe.intermediate.manifest" /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /DEBUG /PDB:"D:\Users\Jon\Documents\programming\ogre\test-game\project_file\Release\test-game.pdb" /SUBSYSTEM:WINDOWS /OPT:REF /OPT:ICF /LTCG /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"D:\Users\Jon\Documents\programming\ogre\test-game\project_file\Release\test-game.lib" /MACHINE:X86 Release\GraphicsCore.obj
          Release\Input.obj
+         Release\Player.obj
          Release\SceneSetup.obj
          Release\stdafx.obj
          Release\World.obj
@@ -31,4 +30,4 @@
 
 Build succeeded.
 
-Time Elapsed 00:00:07.88
+Time Elapsed 00:00:09.19
